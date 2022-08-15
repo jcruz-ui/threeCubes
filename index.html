@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+  
+  <!-- CSS file defines type of canvas -->
+  <link rel="stylesheet" href="./styles.css" />
+  
+  <!-- Include three.js -->
+  <script src="./three.min.js"></script>
+  
+  <!-- Include stats tool -->
+  <script type="javascript" src="./stats.min.js"></script>
+  
+  <!-- Scene script -->
+  <script>
+    /*
+    Blocks of code, the sections written inside {}, are there for easier 
+    reading. However, using this notation takes whatever values &
+    functions inside of it out of the global scope. So, the "var" keyword 
+    is used to fix this.
+    */
+   
+   let startScene = () => {
+     
+     
+    
+    // Canvas, renderer, & scene setup
+    {
+        // Select canvas
+        var canvas = document.querySelector("#c");
+        
+        /* Instantiate new render object. Note that this is just the creation of it.
+        It's not being used @ this point. */
+        var renderer = new THREE.WebGLRenderer({ canvas });
+        
+        //Define size of renderer
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        
+        // Method used to instantiate scene binded to variable "scene"
+        var scene = new THREE.Scene();
+      }
+      
+      // Camera
+      {
+        // Writing the camera's values
+        const fov = 75;
+        
+        const aspect = canvas.clientWidth / canvas.clientHeight;
+        const near_plane = 0.1;
+        const far_plane = 5;
+
+        // Sending the camera's values
+        var camera = new THREE.PerspectiveCamera(
+          fov,
+          aspect,
+          near_plane,
+          far_plane
+          );
+          
+          camera.position.z = 2;
+        }
+        
+        // Light
+        {
+          // Writing the light's values
+          const light_color = 0xffffff; //White light
+          const intensity = 1;
+          
+          // Sending the light's values
+          const light = new THREE.DirectionalLight(light_color, intensity);
+          
+          light.position.set(-1, 2, 4);
+          
+          scene.add(light);
+        }
+        
+        // Cube
+        {
+          // Geometry
+        var geometry = new THREE.BoxGeometry(1, 1, 1);
+        
+        // Function that takes arguments "geometry" & "color" and returns a cube
+        // Three.js is looking for a property called "color" on the material, and if you change the name of the variable to "cubeColor" it can't find that property.
+        function makeInstance(geometry, color, x) {
+          const material = new THREE.MeshPhongMaterial({ color });
+          
+          const cube = new THREE.Mesh(geometry, material);
+          
+          scene.add(cube);
+          
+          cube.position.x = x;
+          
+          return cube;
+        }
+        
+        var cubes = [
+          makeInstance(geometry, 0x44aa88, 0), // Green
+          makeInstance(geometry, 0x8844aa, -2), // Purple
+          makeInstance(geometry, 0xaa8844, 2), // Orange
+        ];
+      }
+      
+      function render(time) {
+        
+        
+        // Cube's rotation speed
+        time *= 0.001; // convert time to seconds
+        
+        /* .forEach means the function below is applied to each instance of the cubes array
+        
+        An index is a number that represents the position of an element in an array.
+        The index of the first element in an array is 0, and the index of the last element is the array's length minus 1
+        
+        This function applies a rotation speed to each instance of the cubes array.
+        
+        So the reason why the cubes end up having different movements is because the index number quantifies the product of the const
+        "speed" to be different for each cube.
+        
+        Each cube ends up with an incrementally faster speed.
+        The first cube's index is 0
+        1 * 0.1 = 0.1.
+        
+        The second cube's index is 1
+        1 + 1 * 0.1 = 1.1
+        
+        The third cube's index is 2
+        1 + 2 * 0.1 = 1.2       */
+        cubes.forEach((cube, currentIndex) => {
+          const speed = 1 + currentIndex * 0.1;
+          const rot = time * speed;
+          cube.rotation.x = rot;
+          cube.rotation.y = rot;
+        });
+        
+        
+        // Call to the render function
+        requestAnimationFrame(render);
+        // Sends the scene & camera to the renderer
+        renderer.render(scene, camera);
+        
+      }
+      requestAnimationFrame(render);
+    };
+    
+    
+    // Inluce stats tool on the top left
+    javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='./stats.min.js';document.head.appendChild(script);})()
+    
+    
+    </script>
+
+</head>
+
+<body>
+
+  <!-- Canvas that will be targeted by the scene script -->
+  <canvas id="c"></canvas>
+
+  <script>
+        startScene();
+  </script>
+
+</body>
+
+</html>
